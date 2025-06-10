@@ -7,8 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gallerySection: document.getElementById('gallery-section'),
         preferenceSection: document.getElementById('preference-section'),
         headerText: document.getElementById('header-text'),
-        tableSelect: document.getElementById('table'),
-        result: document.getElementById('result')
+        tableSelect: document.getElementById('table')
     };
     for (let id in elements) {
         if (!elements[id]) {
@@ -23,8 +22,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // 桌號選擇導航（單頁面切換）
 function selectTable() {
     const table = document.getElementById('table').value;
-    console.log('選取桌號:', table);
+    console.log('選取桌號:', table); // 調試日誌
     if (table) {
+        // 更新標頭
         const headerText = document.getElementById('header-text');
         if (headerText) {
             headerText.textContent = `桌號 ${table} 號，歡迎點餐！`;
@@ -32,6 +32,7 @@ function selectTable() {
             console.error('未找到 header-text 元素');
             return;
         }
+        // 手動切換顯示
         const tableSection = document.getElementById('table-section');
         const menuIntroSection = document.getElementById('menu-intro-section');
         const gallerySection = document.getElementById('gallery-section');
@@ -51,9 +52,8 @@ function selectTable() {
     }
 }
 
-// 點餐選擇顯示並提交
+// 點餐選擇顯示
 function showSelection() {
-    console.log('執行 showSelection');
     const meal = document.getElementById('meal').value;
     const rice = document.getElementById('rice').value;
     const sauce = document.getElementById('sauce').value;
@@ -61,17 +61,30 @@ function showSelection() {
     const addon = document.getElementById('addon').value;
     const result = document.getElementById('result');
 
-    if (!result) {
-        console.error('未找到 result 元素');
-        return;
-    }
-
     const mealPrices = {
-        'beef_don': 150, 'chicken_don': 140, 'seafood_don': 180,
-        'tempura': 160, 'sushi': 200, 'udon': 130,
-        'ramen': 150, 'soba': 140, 'katsu': 160, 'curry': 140
+        'beef_don': 150,
+        'chicken_don': 140,
+        'seafood_don': 180,
+        'tempura': 160,
+        'sushi': 200,
+        'udon': 130,
+        'ramen': 150,
+        'soba': 140,
+        'katsu': 160,
+        'curry': 140
     };
     const basePrice = mealPrices[meal] || 150;
     let addonText = '', addonPrice = 0;
 
-    if (
+    if (addon === '50') { addonText = '加購：+50元 (味噌湯、茶碗蒸)'; addonPrice = 50; }
+    else if (addon === '100') { addonText = '加購：+100元 (可樂餅、綠茶、味噌湯、茶碗蒸)'; addonPrice = 100; }
+    else { addonText = '加購：無'; addonPrice = 0; }
+
+    const total = basePrice + addonPrice;
+    const table = window.selectedTable || '未知';
+    if (result) {
+        result.innerHTML = `桌號：${table}號桌<br>您的選擇：<br>主餐：${meal.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} (${basePrice}元)<br>飯量：${rice}<br>醬汁量：${sauce}<br>配料量：${meat}<br>${addonText}<br>價格明細：主餐 ${basePrice}元 + 加購 ${addonPrice}元 = <strong>${total}元</strong>`;
+    } else {
+        console.error('未找到 result 元素');
+    }
+}

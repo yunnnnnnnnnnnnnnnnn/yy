@@ -1,71 +1,81 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>歐伊系</title>
+  <link rel="stylesheet" href="./style.css">
 
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>歐伊系 日式丼飯</title>
+    <title>歐伊系 日式餐廳</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1>歐伊系 日式丼飯</h1>
-        <p>享受正宗日式丼飯，客製化您的專屬美味！</p>
+        <h1>歐伊系 日式餐廳</h1>
+        <p id="header-text">歡迎光臨，請選擇您的桌號！</p>
     </header>
-    <section class="menu-intro">
-        <h2>菜單介紹</h2>
-        <p>我們的丼飯選用新鮮食材，搭配獨家醬汁，提供牛肉、雞肉與海鮮等多種選擇。您可以自由調整飯量、醬汁與肉量，打造完美餐點。</p>
+
+    <!-- 桌號選擇區域 -->
+    <section class="preference" id="table-section">
+        <h2>選擇桌號</h2>
+        <form id="table-form">
+            <label for="table">桌號：</label>
+            <select id="table" name="table">
+                <option value="1">1號桌</option>
+                <option value="2">2號桌</option>
+                <option value="3">3號桌</option>
+                <option value="4">4號桌</option>
+                <option value="5">5號桌</option>
+                <option value="6">6號桌</option>
+            </select>
+            <button type="button" onclick="selectTable()">確認桌號</button>
+        </form>
     </section>
-    <section class="gallery">
-        <h2>美味展示</h2>
+
+    <!-- 點餐區域 -->
+    <section class="menu-intro" id="menu-intro-section" style="display: none;">
+        <h2>菜單介紹</h2>
+        <p>歐伊系提供豐富的日式主餐，包括經典丼飯、新鮮壽司、熱騰騰的拉麵，以及各式定食與串燒，滿足您的各種口味需求。搭配自訂口味與加購套餐，打造獨一無二的用餐體驗。</p>
+    </section>
+    <section class="gallery" id="gallery-section" style="display: none;">
+        <h2>主餐展示</h2>
         <div class="image-container">
-            <img src="https://images.unsplash.com/photo-1612025358887-7b3b7f4c8b7e" alt="牛肉丼">
-            <img src="https://images.unsplash.com/photo-1604329760668-40e6b6b5f6b6" alt="雞肉丼">
-            <img src="https://images.unsplash.com/photo-1624973895955-40f6d5b4f7f7" alt="海鮮丼">
+            <img src="https://images.unsplash.com/photo-1678684277915-5d3f48977b87?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDkzODkxMDd8&ixlib=rb-4.1.0&q=85" alt="牛肉丼">
+            <img src="https://images.unsplash.com/photo-1564834744159-ff0ea41ba4b9?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDkzODg5NzJ8&ixlib=rb-4.1.0&q=85" alt="雞肉丼">
+            <img src="https://images.unsplash.com/photo-1724365956437-1b7e1ade4cf7?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDkzODg2NDR8&ixlib=rb-4.1.0&q=85" alt="海鮮丼">
+            <img src="https://images.unsplash.com/photo-1535924571710-4c6e27716b6d?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDkzODg4MzF8&ixlib=rb-4.1.0&q=85">
+            <img src="https://images.unsplash.com/photo-1563612116625-3012372fccce?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDkzODgyMjV8&ixlib=rb-4.1.0&q=85" alt="壽司拼盤">
+            <img src="https://images.unsplash.com/photo-1707201124182-099f3d98bb90?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDkzODgxMTZ8&ixlib=rb-4.1.0&q=85" alt="烏冬麵">
+            <img src="https://images.unsplash.com/photo-1709880194933-78c2d9446b6a?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDkzODgzMDZ8&ixlib=rb-4.1.0&q=85" alt="拉麵">
+            <img src="https://images.unsplash.com/photo-1657375624237-d1d1ce037c64?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDkzODg0MDR8&ixlib=rb-4.1.0&q=85" alt="蕎麥麵">
+            <img src="https://images.unsplash.com/photo-1624517607896-bb5dfd8f5764?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDkzODgzNzd8&ixlib=rb-4.1.0&q=85" alt="炸豬排飯">
+            <img src="https://images.unsplash.com/photo-1705313381636-672463bfa6fa?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDkzODgyNjZ8&ixlib=rb-4.1.0&q=85" alt="咖喱飯">
         </div>
     </section>
-    <section class="preference">
-        <h2>客製化您的丼飯</h2>
+    <section class="preference" id="preference-section" style="display: none;">
+        <h2>客製化您的餐點</h2>
         <form id="preference-form">
+            <label for="meal">主餐選擇：</label>
+            <select id="meal" name="meal">
+                <option value="beef_don">牛肉丼 (150元)</option>
+                <option value="chicken_don">雞肉丼 (140元)</option>
+                <option value="seafood_don">海鮮丼 (180元)</option>
+                <option value="tempura">天婦羅定食 (160元)</option>
+                <option value="sushi">壽司拼盤 (200元)</option>
+                <option value="udon">烏冬麵 (130元)</option>
+                <option value="ramen">拉麵 (150元)</option>
+                <option value="soba">蕎麥麵 (140元)</option>
+                <option value="katsu">炸豬排飯 (160元)</option>
+                <option value="curry">咖喱飯 (140元)</option>
+            </select>
             <label for="rice">飯量：</label>
             <select id="rice" name="rice">
                 <option value="more">飯多</option>
@@ -76,15 +86,32 @@
                 <option value="more">汁多</option>
                 <option value="less">汁少</option>
             </select>
-            <label for="meat">肉量：</label>
+            <label for="meat">肉量/配料量：</label>
             <select id="meat" name="meat">
-                <option value="more">肉多</option>
-                <option value="less">肉少</option>
+                <option value="more">多</option>
+                <option value="less">少</option>
             </select>
+            <label for="addon">加購套餐：</label>
+            <select id="addon" name="addon">
+                <option value="0">無加購</option>
+                <option value="50">+50元 (味噌湯、茶碗蒸)</option>
+                <option value="100">+100元 (可樂餅、綠茶、味噌湯、茶碗蒸)</option>
+            </select>
+            <button type="button" onclick="showSelection()">確認選擇</button>
         </form>
+        <div id="recommendation" class="recommendation">
+            <h3>您的選擇</h3>
+            <p id="result">請選擇餐點並確認！</p>
+        </div>
     </section>
     <footer>
-        <p>© 2025 歐伊系 日式丼飯 | 聯繫我們</p>
+        <p>© 2025 歐伊系 日式餐廳 | 聯繫我們</p>
     </footer>
+    <script src="script.js"></script>
+</body>
+</html>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
 </body>
 </html>
