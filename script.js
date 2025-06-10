@@ -88,3 +88,22 @@ function showSelection() {
         console.error('未找到 result 元素');
     }
 }
+
+function order()
+{
+    console.log('送出訂單');
+    // 隱藏點餐區塊
+    document.getElementById('menu-intro-section').style.display = 'none';
+    document.getElementById('gallery-section').style.display = 'none';
+    document.getElementById('preference-section').style.display = 'none';
+
+    // 顯示訂單完成畫面
+    const orderComplete = document.getElementById('order_end');
+    if (orderComplete) 
+    {
+        orderComplete.style.display = 'block';
+        console.log('已切換至訂單完成畫面');
+    } else {
+        console.error('找不到 order_end 元素');
+    }
+}

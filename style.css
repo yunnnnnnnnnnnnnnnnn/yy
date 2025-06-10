@@ -116,3 +116,18 @@ footer {
         font-size: 2rem;
     }
 }
+
+#order button {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: none;
+    background-color: #8B0000;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#order button:hover {
+    background-color: #a11212;
+}
