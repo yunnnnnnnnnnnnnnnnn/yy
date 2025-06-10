@@ -1,0 +1,90 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歐伊系 日式丼飯</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>歐伊系 日式丼飯</h1>
+        <p>享受正宗日式丼飯，客製化您的專屬美味！</p>
+    </header>
+    <section class="menu-intro">
+        <h2>菜單介紹</h2>
+        <p>我們的丼飯選用新鮮食材，搭配獨家醬汁，提供牛肉、雞肉與海鮮等多種選擇。您可以自由調整飯量、醬汁與肉量，打造完美餐點。</p>
+    </section>
+    <section class="gallery">
+        <h2>美味展示</h2>
+        <div class="image-container">
+            <img src="https://images.unsplash.com/photo-1612025358887-7b3b7f4c8b7e" alt="牛肉丼">
+            <img src="https://images.unsplash.com/photo-1604329760668-40e6b6b5f6b6" alt="雞肉丼">
+            <img src="https://images.unsplash.com/photo-1624973895955-40f6d5b4f7f7" alt="海鮮丼">
+        </div>
+    </section>
+    <section class="preference">
+        <h2>客製化您的丼飯</h2>
+        <form id="preference-form">
+            <label for="rice">飯量：</label>
+            <select id="rice" name="rice">
+                <option value="more">飯多</option>
+                <option value="less">飯少</option>
+            </select>
+            <label for="sauce">醬汁量：</label>
+            <select id="sauce" name="sauce">
+                <option value="more">汁多</option>
+                <option value="less">汁少</option>
+            </select>
+            <label for="meat">肉量：</label>
+            <select id="meat" name="meat">
+                <option value="more">肉多</option>
+                <option value="less">肉少</option>
+            </select>
+        </form>
+    </section>
+    <footer>
+        <p>© 2025 歐伊系 日式丼飯 | 聯繫我們</p>
+    </footer>
+</body>
+</html>
